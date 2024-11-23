@@ -1,10 +1,34 @@
+import os
 import streamlit as st
 from openai import OpenAI
+from dotenv import load_dotenv
+
+import weaviate
+from weaviate.classes.init import Auth
+
+load_dotenv()
+
+wcd_api_key = os.getenv('WEAVIATE_API_KEY')
+wcd_url = os.getenv('WEAVIATE_URL')
+hugginface_api_key = os.getenv('HUGGINFACE_API_KEY')
+
+COLLECTION_NAME = "Question"
+
+# Connect to Weaviate Cloud
+wcd_client = weaviate.connect_to_weaviate_cloud(
+    cluster_url=wcd_url,
+    auth_credentials=Auth.api_key(wcd_api_key),
+    headers = {
+        "X-HuggingFace-Api-Key": hugginface_api_key,
+    }
+)
+
+collection = wcd_client.collections.get(COLLECTION_NAME)
 
 st.title("Chat with an AI assistant")
 
 api_key = st.sidebar.text_input("API KEY", None)
-base_url = st.sidebar.text_input("Base URL", None)
+base_url = st.sidebar.text_input("Base URL", 'https://api.together.xyz/v1')
 
 client = OpenAI(api_key=api_key, base_url=base_url)
 
@@ -16,7 +40,23 @@ for message in st.session_state.messages:
         st.markdown(message["content"])
 
 if prompt := st.chat_input("What is up?"):
-    st.session_state.messages.append({"role": "user", "content": prompt})
+    wcd_client.connect()
+
+    wcd_collection = wcd_client.collections.get(COLLECTION_NAME)
+
+    wcd_response = collection.query.near_text(
+        query=prompt,  
+        limit=2
+    )
+
+    wcd_obj = wcd_response.objects[0]
+    retrieved_ans = wcd_obj.properties['answer']
+
+    user_prompt = f"""
+    Given the prompt: "{prompt}", the answer is: "{retrieved_ans}"
+    """
+
+    st.session_state.messages.append({"role": "user", "content": user_prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 

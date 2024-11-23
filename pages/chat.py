@@ -1,4 +1,3 @@
-import os
 import streamlit as st
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -8,9 +7,9 @@ from weaviate.classes.init import Auth
 
 load_dotenv()
 
-wcd_api_key = os.getenv('WEAVIATE_API_KEY')
-wcd_url = os.getenv('WEAVIATE_URL')
-hugginface_api_key = os.getenv('HUGGINFACE_API_KEY')
+wcd_api_key = st.secrets('WEAVIATE_API_KEY')
+wcd_url = st.secrets('WEAVIATE_URL')
+hugginface_api_key = st.secrets('HUGGINFACE_API_KEY')
 
 COLLECTION_NAME = "Question"
 

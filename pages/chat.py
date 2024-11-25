@@ -7,9 +7,9 @@ from weaviate.classes.init import Auth
 
 load_dotenv()
 
-wcd_api_key = st.secrets('WEAVIATE_API_KEY')
-wcd_url = st.secrets('WEAVIATE_URL')
-hugginface_api_key = st.secrets('HUGGINFACE_API_KEY')
+wcd_api_key = st.secrets['WEAVIATE_API_KEY']
+wcd_url = st.secrets[]'WEAVIATE_URL']
+hugginface_api_key = st.secrets['HUGGINFACE_API_KEY']
 
 COLLECTION_NAME = "Question"
 

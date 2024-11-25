@@ -29,6 +29,9 @@ st.title("Chat with an AI assistant")
 api_key = st.sidebar.text_input("API KEY", None)
 base_url = st.sidebar.text_input("Base URL", 'https://api.together.xyz/v1')
 
+if api_key is None:
+    st.stop()
+
 client = OpenAI(api_key=api_key, base_url=base_url)
 
 if "messages" not in st.session_state:
